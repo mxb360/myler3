@@ -93,12 +93,12 @@ myler_key_t get_key(void);
 /* 控制台输出
  * 即putchar
  */
-int console_putchar(int ch);
+int myler_putchar(int ch);
 
 /* 控制台输出
  * 即printf
  */
-int console_printf(const char *format, ...);
+int myler_printf(const char *format, ...);
 
 #ifdef __cplusplus
 }   /* extern "C" { */

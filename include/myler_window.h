@@ -35,6 +35,6 @@ void free_window(window_t *win);
 
 void set_window_align_style(window_t *win, align_style_t align_style);
 
-void set_window_line(window_t *win, pos_t line, color_t color, const char *format, ...);
+void set_window_row_text(window_t *win, pos_t row, color_t color, const char *format, ...);
 
 #endif

@@ -146,7 +146,7 @@ static char *utf8_to_gbk(char *gbk_string, const char *utf8_string)
 }
 #endif
 
-int console_printf(const char *format, ...)
+int myler_printf(const char *format, ...)
 {
 #ifndef USE_WINDOWS_GBK_CONSOLE
     int ret;
@@ -170,7 +170,7 @@ int console_printf(const char *format, ...)
 #endif
 }
 
-int console_putchar(int ch)
+int myler_putchar(int ch)
 {
     return putchar(ch);
 }

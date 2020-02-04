@@ -156,7 +156,7 @@ int console_printf(const char *format, ...)
     return ret;
 }
 
-int console_putchar(int ch)
+int myler_putchar(int ch)
 {
     return putchar(ch);
 }

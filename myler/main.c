@@ -2,15 +2,17 @@
 #include <myler_console.h>
 #include <myler_ui.h>
 
-int main(void)
+int main(int argc, char *argv[])
 {
+    init_myler_utils(argc, argv);
+
     init_ui();
 
     update_ui();
     getchar();
     free_ui();
 
-    console_printf("hello, world: 我是汉字\n");
+    myler_printf("Myler 命令行音乐播放器 V3.0\n");
     
     return 0;
 }

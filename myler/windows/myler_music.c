@@ -67,18 +67,17 @@ static int music_control(music_t *music, const char *cmd, const char *arg)
  */
 music_t *load_music(const char *file_name)
 {
-    music_t *music = (music_t *)malloc(sizeof(struct _music_t));
+    music_t *music = (music_t *)malloc_and_check(sizeof(struct _music_t));
 
-    if (music) {   
-        strcpy(music->file_name, file_name);
-        get_file_name(music->file_name);
-        sprintf(music->device, "myler_music_id_%d", music_data.id++);
-        sprintf(music_data.argbuf, "\"%s\" alias %s", file_name, music->device);
-        if (send_music_cmd_string("open", "", music_data.argbuf)) {
-            free(music);
-            music = NULL;
-        }
+    strcpy(music->file_name, file_name);
+    get_file_name(music->file_name);
+    sprintf(music->device, "myler_music_id_%d", music_data.id++);
+    sprintf(music_data.argbuf, "\"%s\" alias %s", file_name, music->device);
+    if (send_music_cmd_string("open", "", music_data.argbuf)) {
+        free(music);
+        music = NULL;
     }
+
     return music;
 }
 
