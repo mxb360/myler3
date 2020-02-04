@@ -63,7 +63,53 @@ void set_window_pos(window_t *win, rect_t pos)
     /* 将新的大小放在放在缓冲空间里
      * 在更新窗口时，通过比较pos和pos_buf是否相等来判断窗口位置大小是否变化
      */
-    win->pos_buf = pos;
+    win->pos = pos;
+}
+
+/* 绘制窗口边框 */
+void draw_window_framework(window_t *win)
+{
+    set_color(UI_FRAMEWORK_COLOR);
+
+    for (int i = 0; i < 2; i++) {
+        set_pos(win->pos.left, win->pos.top + i * (win->pos.bottom - win->pos.top));
+        console_putchar('+');    
+        for (pos_t x = win->pos.left + 1; x < win->pos.right; x++)
+            console_putchar('-');
+        console_putchar('+');
+    }
+
+    for (int i = 0; i < 2; i++) {
+        for (pos_t y = win->pos.top + 1; y < win->pos.bottom; y++) {
+            set_pos(win->pos.left + i * (win->pos.right - win->pos.left), y);
+            console_putchar('|');
+        }
+    }
+}
+
+/* 更新窗口文字
+ * force: 
+ *  如果为true，强制更新所有行
+ *  如果为false，只更新字符或者颜色有变化的行
+ */
+void update_window_text(window_t *win, bool force)
+{
+    myler_assert(win != NULL, "");
+
+    pos_t h = win->pos.bottom - win->pos.top - 1;
+
+    /* 绘制文字 */
+    for (pos_t line = 0; line < h; line++) {
+        if (!strcmp(win->line[line].str_show_buf, ""))
+            set_window_line(win, line, WINDOW_DEFAULT_COLOR, "");
+
+        if (force || strcmp(win->line[line].str_show, win->line[line].str_show_buf)) {
+            strcpy(win->line[line].str_show, win->line[line].str_show_buf);
+            set_color(win->line[line].color);
+            set_pos(win->pos.left + 1, win->pos.top + line + 1);
+            console_printf(win->line[line].str_show);
+        }
+    }
 }
 
 /* 绘制窗口 
@@ -77,33 +123,14 @@ void draw_window(window_t *win)
     /* 窗口大小 */
     pos_t h = win->pos.bottom - win->pos.top;
     pos_t w = win->pos.right - win->pos.left;
-
     if (h == 0 || w == 0)
         return;
 
     /* 绘制边框 */
-    for (pos_t y = 0; y <= h; y++) {
-        if (y > 0 && y < h)
-            strcpy(win->line[y - 1].str_show, win->line[y - 1].str_show_buf);
-        set_pos(win->pos.left, win->pos.top + y);
-        for (pos_t x = 0; x <= w; x++) {
-            if (x == 0 || y == 0 || x == w || y == h)
-                set_color(UI_FRAMEWORK_COLOR);
-            else
-                set_color(win->line[y - 1].color);
+    draw_window_framework(win);
 
-            if ((x == 0 && y == 0) || (x == w && y == 0) ||
-                (x == 0 && y == h) || (x == w && y == h))
-                putchar('+');
-            else if (x == 0 || x == w)
-                putchar('|');
-            else if (y == 0 || y == h)
-                putchar('-');
-            else
-                putchar(win->line[y - 1].str_show[x - 1]);
-        }
-        putchar('\n');
-    }
+    /* 更新文字 */
+    update_window_text(win, true);
 }
 
 /* 更新窗口 
@@ -116,10 +143,10 @@ void update_window(window_t *win)
 
     /* 如果窗口的位置或者大小发生变化，重绘窗口 */
     if (is_window_pos_changed(win)) {
-        win->pos = win->pos_buf;
+        win->pos_buf = win->pos;
         draw_window(win);
     } else 
-        panic("error");
+        update_window_text(win, false);
 }
 
 /* 销毁窗口，释放空间 */
@@ -130,6 +157,7 @@ void free_window(window_t *win)
     free(win);
 }
 
+
 /* 设置字符串的显示形式，如果字符串超出指定长度，则以“...”结尾，使总长度为length；
  * 否则按设置的对齐方式进行对齐，空格填充空白；该函数所得到的函数长度必为length。
  * string：待设置的字符串
@@ -139,52 +167,42 @@ void free_window(window_t *win)
  */
 static char *string_limit_and_format(char *string, int length, int align_style)
 {
-    int i = 0;
+    myler_assert(length > 3, "字符串过短！");
+    myler_assert(length <= MAX_LINE_LEN, "字符串过长！");
+
+    int index = 0, count = 0;
     char buf[MAX_LINE_LEN + 1];
 
-    if (length <= 0)
-        return strcpy(string, "");
-
-    // 先全部填充空格
-    strcpy(buf, string);
-    memset(string, ' ', length);                
+    strncpy(buf, string, length);
+    memset(string, ' ', length - 1);
     string[length] = 0;
-#if 01
-    while (buf[i] && i < length) {
-        if (buf[i++] < 0)                           // 非ASCII字符
-            i++;
-        if (i == length - 2) {                      // 位置位于非ASCII字符内
-            strcpy(buf + length - 4, " ...");
-            i += 4;
+
+    while (buf[index]) {
+        if (count == length)
             break;
-        } else if (i == length - 3) {               // ASCII字符
-            strcpy(buf + length - 3, "...");
-            i += 3;
+
+        count++;
+        if (buf[index] > 0)
+            index++;
+        else {
+            index += 3;
+            count++;
+        }
+
+        if (count > length) {
+            index -= 3;
             break;
         }
     }
 
-    int len = i; 
+    buf[index] = 0;
 
-    // 按照所设置对齐方式移动字符串
-    if (i == length - 2 || i == length - 3) {
-        strncpy(string, buf, len);
-    } else {
-        if (align_style == ALIGN_LEFT)
-            strncpy(string, buf, len);
-        else if (align_style == ALIGN_CENTER) {
-            strncpy(string + (length - len) / 2, buf, len);
-            /*printf("%s\n", string);
-            while (1)
-            {
-            }*/
-        }
-        else if (align_style == ALIGN_RIGHT)
-            strncpy(string + length - len, buf, len);
-    }
-    #endif
-
-    return string;
+    if (align_style == ALIGN_LEFT)
+        return strncpy(string, buf, index);
+    else if (align_style == ALIGN_RIGHT) 
+        return strncpy(string + length - count, buf, index);
+    else 
+        return strncpy(string + (length - count) / 2, buf, index);
 }
 
 static void format_window_str_to_show(window_t *win, int line)
@@ -208,7 +226,6 @@ void set_window_line(window_t *win, pos_t line, color_t color, const char *forma
 {
     myler_assert(win != NULL, "");
     myler_assert(line < MAX_LINE_CNT, "");
-
     win->line[line].color = color;
 
     va_list ap;

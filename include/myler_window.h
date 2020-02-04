@@ -25,7 +25,11 @@ void set_window_pos(window_t *win, rect_t pos);
 
 void draw_window(window_t *win);
 
+void draw_window_framework(window_t *win);
+
 void update_window(window_t *win);
+
+void update_window_text(window_t *win, bool force);
 
 void free_window(window_t *win);
 

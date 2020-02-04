@@ -1,4 +1,5 @@
-CC=D:\cygwin64\bin\gcc
+#CC=d:\cygwin64\bin\gcc
+CC=gcc
 ARCH?=windows
 TARGET=myler3
 
@@ -9,7 +10,6 @@ CCFLAGS = -Wall  -Iinclude -std=c99 -g
 LDFLAGS = 
 
 ifeq ($(ARCH), windows)
-	CCFLAGS += -fexec-charset=GBK
 	LDFLAGS += -lwinmm
 endif
 

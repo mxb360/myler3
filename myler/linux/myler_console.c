@@ -1,8 +1,10 @@
+#include <myler_utils.h>
 #include <myler_console.h>
 
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdarg.h>
 
 #include <unistd.h>
 #include <fcntl.h>
@@ -43,7 +45,7 @@ static int _getch(void)
 
     tcgetattr(STDIN_FILENO, &org_opts);
     memcpy(&new_opts, &org_opts, sizeof(new_opts));
-    new_opts.c_lflag &= ~(ICANON | ECHO | ECHOE | ECHOK | ECHONL | ECHOKE | ICRNL);
+    new_opts.c_lflag &= ~(ICANON | ECHO | ECHOE | ECHOK | ECHONL | ICRNL);
     tcsetattr(STDIN_FILENO, TCSANOW, &new_opts);
     c = getchar();
     tcsetattr(STDIN_FILENO, TCSANOW, &org_opts);
@@ -71,6 +73,8 @@ void free_console(void)
  */
 void set_color(color_t color)
 {
+    myler_assert(is_color(color), "");
+
     if (con_info.color_disable)
         color = MYLER_DEFAULT_COLOR;
 
@@ -97,7 +101,10 @@ void set_color_enable(bool enable)
  */
 void set_pos(pos_t x, pos_t y)
 {
-   printf("\033[%d;%dH", y + 1, x + 1);
+    myler_assert(x >= 0, "无效的横坐标！");
+    myler_assert(y >= 0, "无效的纵坐标！");
+
+    printf("\033[%d;%dH", y + 1, x + 1);
 }
 
 /* 获取可使用的控制台的大小
@@ -106,7 +113,11 @@ void set_pos(pos_t x, pos_t y)
  */
 void get_console_size(pos_t *w, pos_t *h)
 {
+    myler_assert(w != NULL, "");
+    myler_assert(h != NULL, "");
+
     struct winsize size;
+
     ioctl(STDIN_FILENO, TIOCGWINSZ, &size);
     *w = size.ws_col;
     *h = size.ws_row;
@@ -134,12 +145,18 @@ myler_key_t get_key(void)
     return (myler_key_t)toupper(key);
 }
 
-/* 将utf8编码的字符串转化为控制台支持的编码
- * dest: 新编码的字符串
- * src:  原字符串
- * 返回: 新字符串
- */
-char *utf8_to_con(char *con_string, const char *utf8_string)
+int console_printf(const char *format, ...)
 {
-    return strcpy(con_string, utf8_string);
+    int ret;
+    va_list ap;
+
+    va_start(ap, format);
+    ret = vprintf(format, ap);
+    va_end(ap);
+    return ret;
+}
+
+int console_putchar(int ch)
+{
+    return putchar(ch);
 }

@@ -10,6 +10,8 @@
 #define myler_assert(op, s) ((void)0)
 #endif
 
+#define myler_crash()      do {(*(int *)0 = 0); exit(1); } while (0)
+
 #define panic(s)           myler_panic(__FILE__, __func__, __LINE__, s)
 
 #define myler_max(a, b)    ((a) > (b) ? (a) : (b))

@@ -46,6 +46,9 @@ typedef uint16_t color_t;
  */
 void set_color(color_t color);
 
+/* 判断颜色是否合法 */
+#define is_color(color) ((color) >= 0 && (color) <= MYLER_DEFAULT_COLOR)
+
 /* 是否启用控制台颜色
  * 如果不启用控制台颜色，set_color函数将失效
  * 默认启用
@@ -87,12 +90,15 @@ typedef int8_t myler_key_t;
  */
 myler_key_t get_key(void);
 
-/* 将utf8编码的字符串转化为控制台支持的编码
- * dest: 新编码的字符串
- * src:  原字符串
- * 返回: 新字符串
+/* 控制台输出
+ * 即putchar
  */
-char *utf8_to_con(char *dest, const char *src);
+int console_putchar(int ch);
+
+/* 控制台输出
+ * 即printf
+ */
+int console_printf(const char *format, ...);
 
 #ifdef __cplusplus
 }   /* extern "C" { */

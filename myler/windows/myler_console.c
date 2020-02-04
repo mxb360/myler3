@@ -1,9 +1,15 @@
+#include <myler_utils.h>
 #include <myler_console.h>
 
-#include <conio.h>
+#include <stdio.h>
 #include <stdlib.h>
+#include <conio.h>
 #include <ctype.h>
+#include <stdarg.h>
+
 #include <windows.h>
+
+#define MAX_CONSOLE_BUF   1023
 
 static struct {
     bool is_init;
@@ -42,6 +48,8 @@ void free_console(void)
  */
 void set_color(color_t color)
 {
+    myler_assert(is_color(color), "");
+
     if (!con_info.out)
         get_default_data();
     if (con_info.color_enable) {
@@ -70,6 +78,9 @@ void set_color_enable(bool enable)
  */
 void set_pos(pos_t x, pos_t y)
 {
+    myler_assert(x >= 0, "无效的横坐标！");
+    myler_assert(y >= 0, "无效的纵坐标！");
+
     if (!con_info.out) 
         get_default_data();
     SetConsoleCursorPosition(con_info.out, (COORD){(SHORT)x, (SHORT)y});
@@ -81,6 +92,9 @@ void set_pos(pos_t x, pos_t y)
  */
 void get_console_size(pos_t *w, pos_t *h)
 {
+    myler_assert(w != NULL, "");
+    myler_assert(h != NULL, "");
+
     if (!con_info.out) 
         get_default_data();
 
@@ -109,20 +123,54 @@ myler_key_t get_key(void)
     return (myler_key_t)toupper(key);
 }
 
-/* 将utf8编码的字符串转化为控制台支持的编码
+#ifdef USE_WINDOWS_GBK_CONSOLE
+/* 将utf8编码的字符串转化为gbk的编码
  * dest: 新编码的字符串
  * src:  原字符串
  * 返回: 新字符串
  */
-char *utf8_to_con(char *con_string, const char *utf8_string)
+static char *utf8_to_gbk(char *gbk_string, const char *utf8_string)
 {
+    myler_assert(gbk_string != NULL, "");
+    myler_assert(utf8_string != NULL, "");
+
     wchar_t *unicodeStr = NULL;
     int nRetLen = 0;
     nRetLen = MultiByteToWideChar(CP_UTF8, 0, utf8_string, -1, NULL, 0);
     unicodeStr = (wchar_t *)malloc(nRetLen * sizeof(wchar_t));
     nRetLen = MultiByteToWideChar(CP_UTF8, 0, utf8_string, -1, unicodeStr, nRetLen);
     nRetLen = WideCharToMultiByte(CP_ACP, 0, unicodeStr, -1, NULL, 0, NULL, 0);
-    nRetLen = WideCharToMultiByte(CP_ACP, 0, unicodeStr, -1, con_string, nRetLen, NULL, 0);
+    nRetLen = WideCharToMultiByte(CP_ACP, 0, unicodeStr, -1, gbk_string, nRetLen, NULL, 0);
     free(unicodeStr);
-    return con_string;
+    return gbk_string;
+}
+#endif
+
+int console_printf(const char *format, ...)
+{
+#ifndef USE_WINDOWS_GBK_CONSOLE
+    int ret;
+    va_list ap;
+
+    va_start(ap, format);
+    ret = vprintf(format, ap);
+    va_end(ap);
+    return ret;
+#else
+    va_list ap;
+    char utf8_buf[MAX_CONSOLE_BUF + 1];
+    char gbk_buf[MAX_CONSOLE_BUF + 1];
+
+    va_start(ap, format);
+    vsprintf(utf8_buf, format, ap);
+    va_end(ap);
+
+    utf8_to_gbk(gbk_buf, utf8_buf);
+    return printf("%s", gbk_buf);
+#endif
+}
+
+int console_putchar(int ch)
+{
+    return putchar(ch);
 }

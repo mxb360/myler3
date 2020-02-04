@@ -71,6 +71,8 @@ void init_ui(void)
     set_title_win_enable(true);
     set_list_win_enable(true);
     set_time_win_enable(true);
+
+    set_ui_title("Myler 命令行音乐播放器 V3.0");
 }
 
 void update_ui(void)

@@ -14,21 +14,21 @@
 void myler_panic(const char *file, const char *func, int line, const char *s)
 {
     set_color(MYLER_LIGHT_RED);
-    printf("!!!程序出现运行错误而被迫终止!!!\n");
+    console_printf("!!!程序出现运行错误而被迫终止!!!\n");
     
     set_color(MYLER_LIGHT_WHITE);
-    printf("--------------------------------------------------\n");
-    printf("错误描述：");
+    console_printf("--------------------------------------------------\n");
+    console_printf("错误描述：");
     set_color(MYLER_LIGHT_RED);
-    printf("%s    \n", s);
+    console_printf("%s    \n", s);
 
     set_color(MYLER_LIGHT_WHITE);
-    printf("错误位置：");
+    console_printf("错误位置：");
     set_color(MYLER_LIGHT_PURPL);
-    printf("%s 第%d行，位于函数“%s”里    \n", file, line, func);
+    console_printf("%s 第%d行，位于函数“%s”里    \n", file, line, func);
     set_color(MYLER_DEFAULT_COLOR);
 
-    exit(1);
+    myler_crash();
 }
 
 /* 退出系统 */
