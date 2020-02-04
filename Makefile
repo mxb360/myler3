@@ -1,4 +1,4 @@
-CC=gcc
+CC=D:\cygwin64\bin\gcc
 ARCH?=windows
 TARGET=myler3
 

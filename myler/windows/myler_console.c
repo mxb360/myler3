@@ -90,12 +90,12 @@ void get_console_size(pos_t *w, pos_t *h)
 
 /* 如果有按键按下，返回对应的按键码，否则返回0
  */
-key_t get_key(void)
+myler_key_t get_key(void)
 {
     if (!kbhit())
         return 0;
 
-    key_t key = _getch(); 
+    myler_key_t key = _getch(); 
     
     if (key == -32) {
         switch (_getch()) {
@@ -106,7 +106,7 @@ key_t get_key(void)
         }
     } 
         
-    return (key_t)toupper(key);
+    return (myler_key_t)toupper(key);
 }
 
 /* 将utf8编码的字符串转化为控制台支持的编码

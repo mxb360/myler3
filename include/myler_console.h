@@ -57,7 +57,7 @@ void set_color_enable(bool enable);
  * 控制台的坐标系统：原点在界面左上角，x轴向下，单位为行，y轴向右，单位为一个英文字符宽度
  * 本系统所支持的终端需要使用等宽字体，且ASCII字符占一个单位，一个非ASCII字符站两个单位
  */
-typedef uint16_t pos_t;
+typedef int16_t pos_t;
 
 /* 设置当前输出的坐标位置
  * x: x坐标
@@ -71,12 +71,12 @@ void set_pos(pos_t x, pos_t y);
  */
 void get_console_size(pos_t *w, pos_t *h);
 
-/* key_t: 按键码类型
+/* myler_key_t: 按键码类型
  * 当按下字母时，值为对应大写字母的ASCII码（即不区分大小写），
  * 按下数字或者符号时，值为对应数字或者字母的ASCII码。
  * 按下方向键时，值为MYLER_KEY_UP, MYLER_KEY_DOWN, MYLER_KEY_LEFT, MYLER_KEY_RIGHT之一
  */
-typedef int8_t key_t;
+typedef int8_t myler_key_t;
 
 #define MYLER_KEY_UP        -1
 #define MYLER_KEY_DOWN      -2
@@ -85,7 +85,7 @@ typedef int8_t key_t;
 
 /* 如果有按键按下，返回对应的按键码，否则返回0
  */
-key_t get_key(void);
+myler_key_t get_key(void);
 
 /* 将utf8编码的字符串转化为控制台支持的编码
  * dest: 新编码的字符串
