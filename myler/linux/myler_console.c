@@ -145,7 +145,7 @@ myler_key_t get_key(void)
     return (myler_key_t)toupper(key);
 }
 
-int console_printf(const char *format, ...)
+int myler_printf(const char *format, ...)
 {
     int ret;
     va_list ap;
