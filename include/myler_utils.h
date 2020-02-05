@@ -11,7 +11,7 @@
 #define myler_assert(op, s) ((void)0)
 #endif
 
-/* 引发一个运行错误，使程序崩溃 */
+/* 引发一个运行时错误，使程序崩溃 */
 #define myler_crash()      do {(*(int *)0 = 0); exit(1); } while (0)
 
 /* 发生了不可挽回的错误，终止程序运行 */

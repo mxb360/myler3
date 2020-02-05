@@ -21,6 +21,9 @@ static struct {
     window_t *main_win[MAIN_WIN_COUNT];
     window_t *main_title_win[MAIN_WIN_COUNT];
     window_t *time_win;
+
+    int current_time;
+    int total_time;
 } ui;
 
 /* 更新界面中各个窗口的位置
@@ -73,13 +76,41 @@ static void update_window_pos(void)
             the_main_win_pos.right = main_title_win_pos.left + main_title_w * (1 + type);
         else
             the_main_win_pos.right = main_title_win_pos.right;
-
-        //printf("%d: main_title_w=%d, left=%d right=%d\n", type, main_title_w, the_main_win_pos.left, the_main_win_pos.right);getchar();
         set_window_pos(ui.main_title_win[type], the_main_win_pos);
         
         set_window_pos(ui.main_win[type], main_win_pos);
     }
 }
+
+static void update_time_win(bool force)
+{
+    static int current_time = -1, total_time = -1;
+
+    if (!force && ui.current_time == current_time && ui.total_time == total_time)
+        return;
+
+    current_time = ui.current_time;
+    total_time = ui.total_time;
+    window_t *time_win = ui.time_win;
+    rect_t pos = get_window_pos(time_win);
+    pos_t time_w = pos.right - pos.left - 20;
+    pos_t current_time_w = total_time ? (pos_t)(time_w * ((float)current_time / total_time)) : 0;
+
+    set_color(TIME_COLOR1);
+    set_pos(pos.left + 1, pos.top + 2);
+    myler_printf(" ◎");
+    for (pos_t w = 0; w < current_time_w; w++)
+        myler_putchar('*');
+    set_color(TIME_COLOR2);
+    for (pos_t w = current_time_w; w < time_w; w++)
+        myler_putchar('=');
+    myler_putchar('>');
+    
+    set_color(TIME_COLOR3);
+    myler_printf(" %02d:%02d/%02d:%02d", current_time / 60, current_time % 60, 
+                                         total_time / 60, total_time % 60);
+}
+
 
 /* 创建界面需要的所有的窗口 */
 static void create_ui_window(void)
@@ -104,26 +135,25 @@ static void create_ui_window(void)
 /* 设置一些窗口的标题 */
 static void set_ui_win_title(void)
 {
-    static const char *title[MAIN_WIN_COUNT] = {"歌词", "搜索", "命令"};
+    static const char *title[MAIN_WIN_COUNT] = {"歌词", "搜索", "详情", "命令"};
     
     set_window_row_text(ui.title_win, 0, UI_TITLE_COLOR, "Myler 命令行音乐播放器 V3.0");
     for (main_win_type_t type = 0; type < MAIN_WIN_COUNT; type++) {
         if (type == ui.active_main_win_type)
-            set_window_row_text(ui.main_title_win[type], 0, MAIN_TITLE_ACTIVE_COLOR, title[type]);
+            set_window_row_text(ui.main_title_win[type], 0, MAIN_TITLE_ACTIVE_COLOR, "★%s", title[type]);
         else
             set_window_row_text(ui.main_title_win[type], 0, MAIN_TITLE_DEFAULT_COLOR, title[type]);
     }
-
 }
 
-void ui_window_size_check(void)
+static void ui_window_size_check(void)
 {
     get_console_size(&ui.w, &ui.h);
 
     pos_t min_w = MAIN_WIN_COUNT * 12;
     pos_t min_h = 12;
     if (ui.w < min_w || ui.h < min_h) {
-        myler_print_error("界面初始化失败！可用的窗口太小：要求最小%dx%d，实际为%dx%d。", min_w, min_h, ui.w, ui.h);
+        myler_print_error("界面初始化失败！界面窗口太小：要求最小%dx%d，实际为%dx%d。", min_w, min_h, ui.w, ui.h);
         myler_print_prompt("你可以通过“%s --help-ui”了解如何修改窗口大小。", get_myler_name());
         myler_exit(1);
     }
@@ -137,17 +167,33 @@ void init_ui(void)
     init_cosole();
     create_ui_window();
     set_ui_win_title();
+
+    set_lyric_win_text(-4, "你总是微笑如花");
+    set_lyric_win_text(-3, "总是看我沉醉和绝望");
+    set_lyric_win_text(-2, "我却迟迟都没发现真爱");
+    set_lyric_win_text(-1, "原来在身旁");
+    set_lyric_win_text(0, "你应该被呵护被珍惜被认真被深爱");
+    set_lyric_win_text(1, "被捧在手掌心上");
+    set_lyric_win_text(2, "像一艘从来都不曾靠岸的船");
+    set_lyric_win_text(3, "终于有了你的港湾");
+    set_lyric_win_text(4, "你应该更自私更贪心更坚持更明白");
+    set_lyric_win_text(5, "将我的心全部霸占");
+    set_time_win_time(0, 0);
+
+    update_ui(true);
 }
 
 /* 更新UI */
-void update_ui(void)
+void update_ui(bool force)
 {
-    update_window(ui.title_win);
-    update_window(ui.time_win);
-    update_window(ui.list_win);
-    update_window(ui.main_win[ui.active_main_win_type]);
+    update_window(ui.title_win, force);
+    update_window(ui.time_win, force);
+    update_window(ui.list_win, force);
+    update_window(ui.main_win[ui.active_main_win_type], force);
+    update_time_win(force);
     for (main_win_type_t type = 0; type < MAIN_WIN_COUNT; type++)
-        update_window(ui.main_title_win[type]);
+        update_window(ui.main_title_win[type], force);
+
 }
 
 /* 销毁UI，释放内存 */
@@ -185,9 +231,53 @@ void set_main_title_win_enable(bool enable)
     update_window_pos();
 }
 
+/********************** lyric window *******************************/
+
+void set_lyric_win_text(int row, const char *text)
+{
+    window_t *lyric_win = ui.main_win[LYRIC_MAIN_WINDOW];
+    pos_t h = get_window_text_lines(lyric_win);
+    
+    pos_t real_row = row + h / 2;
+
+    if (real_row < 0 || real_row >= h)
+        return;
+
+    if (row == 0) {
+        set_window_row_text(lyric_win, real_row, CURRENT_LYRIC_COLOR, ">>> %s <<<", text);
+        set_window_row_text(ui.time_win, 2, CURRENT_LYRIC_COLOR, "%s", text);
+    } else
+        set_window_row_text(lyric_win, real_row, DEFAULT_LYRIC_COLOR, text);
+}
+
+void set_lyric_win_no_lyric(void)
+{
+    window_t *lyric_win = ui.main_win[LYRIC_MAIN_WINDOW];
+    pos_t h = get_window_text_lines(lyric_win);
+
+    for (pos_t row = 0; row < h; row++) {
+        if (row == h / 2)
+            set_window_row_text(lyric_win, row, MYLER_LIGHT_RED, ">>> 没有找到歌词 <<<");
+        else
+            set_window_row_text(lyric_win, row, DEFAULT_LYRIC_COLOR, "");
+    }
+}
+
+/********************** time window *******************************/
+
 /* 时间进度窗口是否可见 */
 void set_time_win_enable(bool enable)
 {
     ui.use_time_win = enable;
     update_window_pos();
+}
+
+void set_time_win_time(int current_time, int total_time)
+{
+    myler_assert(current_time >= 0, "");
+    myler_assert(current_time <= total_time, "");
+    myler_assert(total_time < 59940, "");
+
+    ui.current_time = current_time;
+    ui.total_time = total_time;
 }

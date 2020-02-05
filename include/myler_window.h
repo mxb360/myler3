@@ -27,7 +27,7 @@ void draw_window(window_t *win);
 
 void draw_window_framework(window_t *win);
 
-void update_window(window_t *win);
+void update_window(window_t *win, bool force);
 
 void update_window_text(window_t *win, bool force);
 
@@ -36,5 +36,11 @@ void free_window(window_t *win);
 void set_window_align_style(window_t *win, align_style_t align_style);
 
 void set_window_row_text(window_t *win, pos_t row, color_t color, const char *format, ...);
+
+pos_t get_window_text_lines(window_t *win);
+
+pos_t get_window_text_length(window_t *win);
+
+rect_t get_window_pos(window_t *win);
 
 #endif

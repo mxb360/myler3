@@ -13,14 +13,13 @@
 
 static struct {
     bool is_init;
-    bool color_enable;
+    bool color_disable;
     HANDLE out;
     CONSOLE_SCREEN_BUFFER_INFO screen;
 } con_info;
 
 static void get_default_data(void)
 {
-    con_info.color_enable = true;
     con_info.out = GetStdHandle(STD_OUTPUT_HANDLE);
     GetConsoleScreenBufferInfo(con_info.out, &con_info.screen);
 }
@@ -52,7 +51,7 @@ void set_color(color_t color)
 
     if (!con_info.out)
         get_default_data();
-    if (con_info.color_enable) {
+    if (!con_info.color_disable) {
         if (color == MYLER_DEFAULT_COLOR)
             SetConsoleTextAttribute(con_info.out, con_info.screen.wAttributes);
         else
@@ -67,7 +66,7 @@ void set_color(color_t color)
  */
 void set_color_enable(bool enable)
 {
-    con_info.color_enable = enable;
+    con_info.color_disable = !enable;
     if (!enable)
         SetConsoleTextAttribute(con_info.out, con_info.screen.wAttributes);
 }

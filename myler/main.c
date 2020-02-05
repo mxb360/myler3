@@ -8,7 +8,7 @@ int main(int argc, char *argv[])
 
     init_ui();
 
-    update_ui();
+    update_ui(false);
     getchar();
     free_ui();
 

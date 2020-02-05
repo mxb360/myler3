@@ -36,8 +36,8 @@ void _myler_panic(const char *file, const char *func, int line, const char *s)
 /* 退出系统 */
 void myler_exit(int code)
 {
-    if (code)
-        myler_print_error("播放器异常退出。返回码：%d。\n", code);
+    //if (code)
+    //    myler_print_error("播放器异常退出。返回码：%d。", code);
     exit(code);
 }
 
