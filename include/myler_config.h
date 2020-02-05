@@ -24,4 +24,6 @@
 #define TIME_COLOR2                 MYLER_PURPL
 #define TIME_COLOR3                 MYLER_LIGHT_WHITE
 
+#define UI_STATUS_COLOR             MYLER_LIGHT_GREEN
+
 #endif

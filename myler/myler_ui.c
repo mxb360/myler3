@@ -98,7 +98,7 @@ static void update_time_win(bool force)
 
     set_color(TIME_COLOR1);
     set_pos(pos.left + 1, pos.top + 2);
-    myler_printf(" ◎");
+    myler_printf(" 〇");
     for (pos_t w = 0; w < current_time_w; w++)
         myler_putchar('*');
     set_color(TIME_COLOR2);
@@ -130,6 +130,9 @@ static void create_ui_window(void)
     set_list_win_enable(true);
     set_time_win_enable(true);
     set_main_title_win_enable(true);
+
+    set_time_win_time(0, 0);
+    set_ui_status_and_music_name(UI_NOT_USE, NULL);
 }
 
 /* 设置一些窗口的标题 */
@@ -140,12 +143,13 @@ static void set_ui_win_title(void)
     set_window_row_text(ui.title_win, 0, UI_TITLE_COLOR, "Myler 命令行音乐播放器 V3.0");
     for (main_win_type_t type = 0; type < MAIN_WIN_COUNT; type++) {
         if (type == ui.active_main_win_type)
-            set_window_row_text(ui.main_title_win[type], 0, MAIN_TITLE_ACTIVE_COLOR, "★%s", title[type]);
+            set_window_row_text(ui.main_title_win[type], 0, MAIN_TITLE_ACTIVE_COLOR, "<%s>", title[type]);
         else
             set_window_row_text(ui.main_title_win[type], 0, MAIN_TITLE_DEFAULT_COLOR, title[type]);
     }
 }
 
+/* 窗口大小检查 */
 static void ui_window_size_check(void)
 {
     get_console_size(&ui.w, &ui.h);
@@ -168,6 +172,7 @@ void init_ui(void)
     create_ui_window();
     set_ui_win_title();
 
+
     set_lyric_win_text(-4, "你总是微笑如花");
     set_lyric_win_text(-3, "总是看我沉醉和绝望");
     set_lyric_win_text(-2, "我却迟迟都没发现真爱");
@@ -178,7 +183,8 @@ void init_ui(void)
     set_lyric_win_text(3, "终于有了你的港湾");
     set_lyric_win_text(4, "你应该更自私更贪心更坚持更明白");
     set_lyric_win_text(5, "将我的心全部霸占");
-    set_time_win_time(0, 0);
+    set_time_win_time(114, 257);
+    set_ui_status_and_music_name(UI_PLAYING, "小小的太阳");
 
     update_ui(true);
 }
@@ -233,6 +239,11 @@ void set_main_title_win_enable(bool enable)
 
 /********************** lyric window *******************************/
 
+/* 设置歌词窗口显示的歌词
+ * 当前的歌词（row为0）有专门的标记，并且会在进度条下方显示
+ * row: 行数，中间(当前歌词)为0，向上(之前的歌词)为负，向下(之后的歌词)为正
+ * text：歌词
+ */
 void set_lyric_win_text(int row, const char *text)
 {
     window_t *lyric_win = ui.main_win[LYRIC_MAIN_WINDOW];
@@ -272,6 +283,7 @@ void set_time_win_enable(bool enable)
     update_window_pos();
 }
 
+/* 设置时间窗口的当前播放的时间和总时长，单位为秒 */
 void set_time_win_time(int current_time, int total_time)
 {
     myler_assert(current_time >= 0, "");
@@ -280,4 +292,21 @@ void set_time_win_time(int current_time, int total_time)
 
     ui.current_time = current_time;
     ui.total_time = total_time;
+}
+
+void set_ui_status_and_music_name(ui_status_t status, const char *music_name)
+{
+    switch (status) {
+    case UI_PLAYING:
+        set_window_row_text(ui.time_win, 0, UI_STATUS_COLOR, "正在播放“%s”", music_name);
+        break;
+    case UI_PAUSED:
+        set_window_row_text(ui.time_win, 0, UI_STATUS_COLOR, "已暂停播放“%s”", music_name);
+        break;
+    case UI_NOT_USE:
+        set_window_row_text(ui.time_win, 0, UI_STATUS_COLOR, "播放器空闲中...");
+        break;
+    default:
+        break;
+    }
 }
