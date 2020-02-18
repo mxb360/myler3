@@ -39,36 +39,41 @@ static void update_window_pos(void)
     rect_t time_win_pos;
     rect_t the_main_win_pos;
 
+    /* 计算标题窗口的位置 */
     title_win_pos.right = ui.w - 2;
     title_win_pos.left = 0;
     title_win_pos.top = 0;
     title_win_pos.bottom = title_win_pos.top + (ui.use_title_win ? 2 : 0);
 
+    /* 计算进度条窗口的位置 */
     time_win_pos.bottom = ui.h - 2;
     time_win_pos.left = 0;
     time_win_pos.right = ui.w - 2;
     time_win_pos.top = ui.h - (ui.use_time_win ? 6 : 2);
 
+    /* 计算列表窗口的位置 */
     list_win_pos.left = 0;
     list_win_pos.top = title_win_pos.bottom;
     list_win_pos.bottom = time_win_pos.top;
     list_win_pos.right = ui.use_list_win ? ui.list_win_w : list_win_pos.left;
 
+    /* 计算主窗口标题窗口的位置 */
     main_title_win_pos.left = list_win_pos.right;
     main_title_win_pos.top = title_win_pos.bottom;
     main_title_win_pos.bottom = main_title_win_pos.top + (ui.use_main_title_win ? 2 : 0);
     main_title_win_pos.right = ui.w - 2;
     the_main_win_pos = main_title_win_pos;
 
+    /* 计算主窗口的位置 */
     main_win_pos.left = list_win_pos.right;
     main_win_pos.top = main_title_win_pos.bottom;
     main_win_pos.bottom = time_win_pos.top;
     main_win_pos.right = ui.w - 2;
 
+    /* 设置这些窗口的位置 */
     set_window_pos(ui.title_win, title_win_pos);
     set_window_pos(ui.list_win, list_win_pos);
     set_window_pos(ui.time_win, time_win_pos);
-
     pos_t main_title_w = (main_title_win_pos.right - main_title_win_pos.left) / MAIN_WIN_COUNT;
     for (main_win_type_t type = 0; type < MAIN_WIN_COUNT; type++) {
         the_main_win_pos.left = main_title_win_pos.left + main_title_w * type;
@@ -77,7 +82,6 @@ static void update_window_pos(void)
         else
             the_main_win_pos.right = main_title_win_pos.right;
         set_window_pos(ui.main_title_win[type], the_main_win_pos);
-        
         set_window_pos(ui.main_win[type], main_win_pos);
     }
 }
@@ -98,12 +102,12 @@ static void update_time_win(bool force)
 
     set_color(TIME_COLOR1);
     set_pos(pos.left + 1, pos.top + 2);
-    myler_printf(" 〇");
+    myler_printf(" +");
     for (pos_t w = 0; w < current_time_w; w++)
-        myler_putchar('*');
+        myler_putchar('=');
     set_color(TIME_COLOR2);
     for (pos_t w = current_time_w; w < time_w; w++)
-        myler_putchar('=');
+        myler_putchar('-');
     myler_putchar('>');
     
     set_color(TIME_COLOR3);

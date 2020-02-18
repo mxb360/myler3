@@ -7,6 +7,11 @@
 /* Windows下，控制台使用的是GBK编码（该配置仅在Windows下有效） */
 #define USE_WINDOWS_GBK_CONSOLE
 
+/* 歌曲信息配置 */
+#define MAX_SONG_NAME    63
+#define MAX_SINGER_NAME  63
+#define MAX_FILE_NAME    255
+
 /* 颜色配置 */
 #define M_ERROR_COLOR               MYLER_LIGHT_RED
 

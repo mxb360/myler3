@@ -100,6 +100,10 @@ int myler_putchar(int ch);
  */
 int myler_printf(const char *format, ...);
 
+/*  延时ms毫秒
+ */
+void myler_delay_ms(int ms);
+
 #ifdef __cplusplus
 }   /* extern "C" { */
 #endif

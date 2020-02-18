@@ -16,6 +16,11 @@
 extern "C" {
 #endif 
 
+typedef struct music_info {
+    char *name;
+    char *singer;
+} music_info_t;
+
 typedef unsigned long mlen_t;
 typedef struct _music_t music_t;
 

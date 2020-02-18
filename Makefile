@@ -3,7 +3,7 @@ CC=gcc
 ARCH?=windows
 TARGET=myler3
 
-MYLER_PATH=myler
+MYLER_PATH=src
 ARCH_PATH=$(MYLER_PATH)/$(ARCH)
 
 CCFLAGS = -g -Wall -Iinclude -std=c99
@@ -13,12 +13,15 @@ ifeq ($(ARCH), windows)
 	LDFLAGS += -lwinmm
 endif
 
-ARCH_OBJ = $(ARCH_PATH)/myler_console.o  	\
-           $(ARCH_PATH)/myler_music.o    	\
+ARCH_OBJ = $(ARCH_PATH)/myler_console.o     \
+           $(ARCH_PATH)/myler_music.o       \
 
-MYLER_OBJ = $(MYLER_PATH)/myler_utils.o  	\
+MYLER_OBJ = $(MYLER_PATH)/myler_utils.o     \
 			$(MYLER_PATH)/myler_window.o    \
             $(MYLER_PATH)/myler_ui.o     	\
+            $(MYLER_PATH)/myler_song.o     	\
+            $(MYLER_PATH)/myler_lyric.o     \
+            $(MYLER_PATH)/myler_list.o      \
 
 MAIN_OBJ = $(MYLER_PATH)/main.o
 

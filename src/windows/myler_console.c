@@ -173,3 +173,8 @@ int myler_putchar(int ch)
 {
     return putchar(ch);
 }
+
+void myler_delay_ms(int ms)
+{
+    Sleep(ms);
+}

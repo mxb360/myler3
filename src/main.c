@@ -8,8 +8,15 @@ int main(int argc, char *argv[])
 
     init_ui();
 
-    update_ui(false);
-    getchar();
+    while (true) {
+        update_ui(false);
+        
+        if (get_key() == 'Q')
+            break;
+
+        myler_delay_ms(100);
+    }
+    
     free_ui();
 
     myler_printf("Myler 命令行音乐播放器 V3.0\n");
