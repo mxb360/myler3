@@ -1,4 +1,3 @@
-#CC=d:\cygwin64\bin\gcc
 CC=gcc
 ARCH?=windows
 TARGET=myler3
@@ -24,7 +23,6 @@ MYLER_OBJ = $(MYLER_PATH)/myler_utils.o     \
             $(MYLER_PATH)/myler_list.o      \
 
 MAIN_OBJ = $(MYLER_PATH)/main.o
-
 
 
 all: $(TARGET)
