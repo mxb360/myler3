@@ -1,11 +1,11 @@
-CC=gcc
-ARCH?=windows
-TARGET=myler3
+CC = gcc
+ARCH = windows
+TARGET = myler3
 
 MYLER_PATH=src
 ARCH_PATH=$(MYLER_PATH)/$(ARCH)
 
-CCFLAGS = -g -Wall -Iinclude -std=c99
+CCFLAGS = -g -Wall -Werror -Iinclude -std=c99
 LDFLAGS =
 
 ifeq ($(ARCH), windows)
