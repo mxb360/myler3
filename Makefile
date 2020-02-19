@@ -27,6 +27,7 @@ MYLER_OBJ = $(MYLER_PATH)/myler_utils.o     \
             $(MYLER_PATH)/myler_song.o     	\
             $(MYLER_PATH)/myler_lyric.o     \
             $(MYLER_PATH)/myler_list.o      \
+            $(MYLER_PATH)/myler_listwin.o   \
 
 MAIN_OBJ = $(MYLER_PATH)/main.o
 

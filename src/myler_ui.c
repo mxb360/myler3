@@ -1,6 +1,8 @@
 #include <myler_ui.h>
 #include <myler_utils.h>
 #include <myler_window.h>
+#include <myler_list.h>
+#include <myler_listwin.h>
 #include <myler_console.h>
 
 static struct {
@@ -17,7 +19,7 @@ static struct {
     main_win_type_t active_main_win_type;
 
     window_t *title_win;
-    window_t *list_win;
+    listwin_t *list_win;
     window_t *main_win[MAIN_WIN_COUNT];
     window_t *main_title_win[MAIN_WIN_COUNT];
     window_t *time_win;
@@ -72,7 +74,7 @@ static void update_window_pos(void)
 
     /* 设置这些窗口的位置 */
     set_window_pos(ui.title_win, title_win_pos);
-    set_window_pos(ui.list_win, list_win_pos);
+    set_window_pos(ui.list_win->win, list_win_pos);
     set_window_pos(ui.time_win, time_win_pos);
     pos_t main_title_w = (main_title_win_pos.right - main_title_win_pos.left) / MAIN_WIN_COUNT;
     for (main_win_type_t type = 0; type < MAIN_WIN_COUNT; type++) {
@@ -120,7 +122,7 @@ static void update_time_win(bool force)
 static void create_ui_window(void)
 {
     ui.title_win = create_window();
-    ui.list_win = create_window();
+    ui.list_win = create_listwin();
     ui.time_win = create_window();
     for (main_win_type_t type = 0; type < MAIN_WIN_COUNT; type++) {
         ui.main_win[type] = create_window();
@@ -137,6 +139,11 @@ static void create_ui_window(void)
 
     set_time_win_time(0, 0);
     set_ui_status_and_music_name(UI_NOT_USE, NULL);
+
+    list_t *list = create_list_from_path("MUSIC", "/home/mxb/Music");
+    set_listwin_list(ui.list_win, list);
+    load_list_to_listwin(ui.list_win);
+    free_list(list);
 }
 
 /* 设置一些窗口的标题 */
@@ -198,19 +205,18 @@ void update_ui(bool force)
 {
     update_window(ui.title_win, force);
     update_window(ui.time_win, force);
-    update_window(ui.list_win, force);
+    update_window(ui.list_win->win, force);
     update_window(ui.main_win[ui.active_main_win_type], force);
     update_time_win(force);
     for (main_win_type_t type = 0; type < MAIN_WIN_COUNT; type++)
         update_window(ui.main_title_win[type], force);
-
 }
 
 /* 销毁UI，释放内存 */
 void free_ui(void)
 {
     free_window(ui.title_win);
-    free_window(ui.list_win);
+    free_listwin(ui.list_win);
     free_window(ui.time_win);
     for (main_win_type_t type = 0; type < MAIN_WIN_COUNT; type++) {
         free_window(ui.main_win[type]);

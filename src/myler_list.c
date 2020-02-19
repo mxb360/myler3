@@ -23,6 +23,7 @@ list_t *new_list(const char *list_name)
 
     list->head.next = list->head.prev = NULL;
     list->length = 0;
+    list->current = NULL;
     return list;
 }
 
@@ -60,6 +61,9 @@ void insert_song_to_list(list_t *list, song_t *song, int index)
     node->next->prev = node;
     node->next->next = node_next;
     list->length++;
+
+    //if (!list->current)
+    //    list->current = node->next;
 }
 
 song_t *remove_song_to_list(list_t *list, int index)
@@ -78,6 +82,8 @@ song_t *remove_song_to_list(list_t *list, int index)
     list->length--;
     node->prev->next = node->next;
     node->next->prev = node->prev;
+    if (list->current == node)
+        list->current = node->next;
     myler_free(node);
     return song;
 }
@@ -89,11 +95,23 @@ song_t *get_song_from_list(list_t *list, int index)
     if (list->length == 0)
         return NULL;
 
-    list_node_t *node = &list->head;
-    for (int i = 0; (i == -1 || i < index) && node->next; i++)
-        node = node->next;
-    return node->song;
+    list_node_t *node = get_node_from_list(list, index);
+    return node ? node->song : NULL;
 }
+
+list_node_t *get_node_from_list(list_t *list, int index)
+{
+    myler_assert(list != NULL, "");
+    myler_assert(index >= -1, "index should be >= -1");
+    if (list->length == 0)
+        return NULL;
+
+    list_node_t *node = &list->head;
+    for (int i = 0; (i == -1 || i < index) && node; i++)
+        node = node->next;
+    return node->next;
+}
+
 
 void free_list(list_t *list)
 {

@@ -29,6 +29,8 @@ song_t *remove_song_to_list(list_t *list, int index);
 
 song_t *get_song_from_list(list_t *list, int index);
 
+list_node_t *get_node_from_list(list_t *list, int index);
+
 void free_list(list_t *list);
 
 #endif
