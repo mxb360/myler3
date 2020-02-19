@@ -4,7 +4,7 @@
 #include <myler_config.h>
 #include <myler_type.h>
 
-/*myler_assert: 断言宏 */
+/* myler_assert: 断言宏 */
 #ifdef MYLER_DEBUG
 #define myler_assert(op, s) ((op) ? (void)0 : myler_panic("断言“" #op "”失败：" s))
 #else
@@ -21,14 +21,19 @@ void   _myler_panic(const char *file, const char *func, int line, const char *s)
 #define myler_max(a, b)    ((a) > (b) ? (a) : (b))
 #define myler_min(a, b)    ((a) < (b) ? (a) : (b))
 
-/* 分配内存并做空指针检查 */
-void *malloc_and_check(int size);
+/* no-null-malloc and free */
+void *myler_malloc(int size);
+void myler_free(void *p);
 
 void init_myler_utils(int argc, char *argv[]);
 const char *get_myler_name(void);
 
 void myler_print_error(const char *format, ...);
 void myler_print_prompt(const char *format, ...);
+void myler_print_warning(const char *format, ...);
 void myler_exit(int code);
+
+char *get_file_name_from_path(char *file_name, const char *path);
+
 
 #endif

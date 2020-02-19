@@ -1,7 +1,7 @@
 #include <myler_utils.h>
 #include <myler_music.h>
 
-#include <stdlib.h>
+#include <string.h>
 
 struct _music_t {
     char file_name[256];
@@ -14,7 +14,9 @@ struct _music_t {
  */
 music_t *load_music(const char *file_name)
 {
-    music_t *music = (music_t *)malloc_and_check(sizeof(struct _music_t));
+    music_t *music = myler_malloc(sizeof(struct _music_t));
+    
+    get_file_name_from_path(music->file_name, file_name);
 
     return music;
 }
@@ -35,7 +37,7 @@ int play_music(music_t *music)
 void free_music(music_t *music)
 {
     myler_assert(music != NULL, "");
-    free(music);
+    myler_free(music);
 }
 
 /* 暂停播放音乐
@@ -108,12 +110,21 @@ int get_music_volume(music_t *music)
     return MUSIC_ERROR;
 }
 
- int get_music_status(music_t *music)
- {
+int get_music_status(music_t *music)
+{
     myler_assert(music != NULL, "");
     return MUSIC_ERROR;
 
- }
+}
+
+void get_music_info(music_t *music, music_info_t *music_info)
+{
+    myler_assert(music != NULL, "");
+    myler_assert(music_info != NULL, "");
+
+    strcpy(music_info->name, "");
+    strcpy(music_info->singer, "");
+}
 
 /* 获取音乐文件名（含路径）
  * music:    Music指针
@@ -122,13 +133,25 @@ int get_music_volume(music_t *music)
 const char *get_music_file_name(music_t *music)
 {
     myler_assert(music != NULL, "");
-    return "";
+    return music->file_name;
 }
 
 /* 获取上一个Music函数的执行错误描述字符串
  * 如果上一个Music函数执行正确，返回"OK"
  */
-const char *music_get_last_error(void)
+const char *get_music_last_error(void)
 {
     return "";
+}
+
+bool is_music_file(const char *file_name)
+{
+    static const char *suport_file_ext[] = {".mp3", };
+    char *ext = strrchr(file_name, '.');
+
+    for (int i = 0; i < sizeof(suport_file_ext)/sizeof(const char *); i++) {
+        if (!strcmp(ext, suport_file_ext[i]))
+            return true;
+    }
+    return false;
 }

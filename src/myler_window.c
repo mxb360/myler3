@@ -3,7 +3,6 @@
 #include <myler_console.h>
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
 
@@ -43,7 +42,7 @@ static bool is_window_pos_changed(window_t *win)
  */
 window_t *create_window(void)
 {
-    window_t *win = (window_t *)malloc_and_check(sizeof(window_t));
+    window_t *win = myler_malloc(sizeof(window_t));
 
     memset(win, 0, sizeof(window_t));
 
@@ -159,7 +158,7 @@ void free_window(window_t *win)
 {
     myler_assert(win != NULL, "");
 
-    free(win);
+    myler_free(win);
 }
 
 /* 设置字符串的显示形式，如果字符串超出指定长度，则以“..”结尾

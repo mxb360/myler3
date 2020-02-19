@@ -1,3 +1,4 @@
-**/*.o
-.vscode/
+*.o
+*.d
+.vscode
 myler3*

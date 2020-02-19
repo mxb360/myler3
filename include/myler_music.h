@@ -17,8 +17,8 @@ extern "C" {
 #endif 
 
 typedef struct music_info {
-    char *name;
-    char *singer;
+    char name[MAX_SONG_NAME];
+    char singer[MAX_SINGER_NAME];
 } music_info_t;
 
 typedef unsigned long mlen_t;
@@ -48,9 +48,13 @@ int get_music_volume(music_t *music);
 
 int get_music_status(music_t *music);
 
+void get_music_info(music_t *music, music_info_t *music_info);
+
 const char *get_music_file_name(music_t *music);
 
 const char *get_music_last_error(void);
+
+bool is_music_file(const char *file_name);
 
 #ifdef __cplusplus
 }   /* extern "C" { */

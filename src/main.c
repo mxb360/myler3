@@ -1,6 +1,4 @@
-#include <myler_utils.h>
-#include <myler_console.h>
-#include <myler_ui.h>
+#include <myler.h>
 
 int main(int argc, char *argv[])
 {
@@ -20,6 +18,17 @@ int main(int argc, char *argv[])
     free_ui();
 
     myler_printf("Myler 命令行音乐播放器 V3.0\n");
+
+    list_t *list = create_list_from_path("MUSIC", "/home/mxb/Music");
+    if (list) {
+        list_node_t *node = list->head.next;
+        while (node) {
+            printf("  %s\n", node->song->file_info.filename);
+            node = node->next;
+        }
+    }
+
+    free_list(list);
     
     return 0;
 }

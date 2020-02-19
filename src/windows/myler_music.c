@@ -25,16 +25,6 @@ struct _music_t {
     char device[20];
 };
 
-static char *get_file_name(char *path)
-{
-    int i = strlen(path);
-
-    while (--i >= 0 && path[i] != '\\' && path[i] != '/');
-    if (i > 0)
-        strcpy(path, path + i + 1);
-    return path;
-}
-
 /* 对mciSendString的一个简易封装
  * - 私有函数
  */
@@ -67,14 +57,13 @@ static int music_control(music_t *music, const char *cmd, const char *arg)
  */
 music_t *load_music(const char *file_name)
 {
-    music_t *music = (music_t *)malloc_and_check(sizeof(struct _music_t));
+    music_t *music = myler_malloc(sizeof(struct _music_t));
 
-    strcpy(music->file_name, file_name);
-    get_file_name(music->file_name);
+    get_file_name_from_path(music->file_name, file_name);
     sprintf(music->device, "myler_music_id_%d", music_data.id++);
     sprintf(music_data.argbuf, "\"%s\" alias %s", file_name, music->device);
     if (send_music_cmd_string("open", "", music_data.argbuf)) {
-        free(music);
+        myler_free(music);
         music = NULL;
     }
 
@@ -98,7 +87,7 @@ void free_music(music_t *music)
 {
     myler_assert(music != NULL, "");
     music_control(music, "close", "");
-    free(music);
+    myler_free(music);
 }
 
 /* 暂停播放音乐
@@ -189,8 +178,8 @@ int get_music_volume(music_t *music)
     return volume;
 }
 
- int get_music_status(music_t *music)
- {
+int get_music_status(music_t *music)
+{
     myler_assert(music != NULL, "");
     
     if (music_control(music, "status", "mode"))
@@ -204,7 +193,16 @@ int get_music_volume(music_t *music)
     else if (strstr(music_data.retbuf, "playing"))
         return MUSIC_PLAYING;
     return MUSIC_OK;
- }
+}
+
+void get_music_info(music_t *music, music_info_t *music_info)
+{
+    myler_assert(music != NULL, "");
+    myler_assert(music_info != NULL, "");
+
+    strcpy(music_info->name, "");
+    strcpy(music_info->singer, "");
+}
 
 /* 获取音乐文件名（含路径）
  * music:    Music指针
@@ -219,7 +217,19 @@ const char *get_music_file_name(music_t *music)
 /* 获取上一个Music函数的执行错误描述字符串
  * 如果上一个Music函数执行正确，返回"OK"
  */
-const char *music_get_last_error(void)
+const char *get_music_last_error(void)
 {
     return music_data.err;
+}
+
+bool is_music_file(const char *file_name)
+{
+    static const char *suport_file_ext[] = {".mp3", };
+    char *ext = strrchr(file_name, '.');
+
+    for (int i = 0; i < sizeof(suport_file_ext)/sizeof(const char *); i++) {
+        if (!strcmp(ext, suport_file_ext[i]))
+            return true;
+    }
+    return false;
 }

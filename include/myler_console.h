@@ -34,7 +34,7 @@ typedef uint16_t color_t;
 #define MYLER_GRAY              8
 #define MYLER_LIGHT_BLUE        9
 #define MYLER_LIGHT_GREEN       10
-#define MYLER_LIGHT_CYGN        11          
+#define MYLER_LIGHT_CYAN        11          
 #define MYLER_LIGHT_RED         12        
 #define MYLER_LIGHT_PURPL       13          
 #define MYLER_LIGHT_YELLOW      14     

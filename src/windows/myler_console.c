@@ -140,7 +140,7 @@ static char *utf8_to_gbk(char *gbk_string, const char *utf8_string)
     nRetLen = MultiByteToWideChar(CP_UTF8, 0, utf8_string, -1, unicodeStr, nRetLen);
     nRetLen = WideCharToMultiByte(CP_ACP, 0, unicodeStr, -1, NULL, 0, NULL, 0);
     nRetLen = WideCharToMultiByte(CP_ACP, 0, unicodeStr, -1, gbk_string, nRetLen, NULL, 0);
-    free(unicodeStr);
+    myler_free(unicodeStr);
     return gbk_string;
 }
 #endif

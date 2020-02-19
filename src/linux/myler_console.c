@@ -65,6 +65,8 @@ void init_cosole(void)
 void free_console(void)
 {
     con_info.is_init = 0;
+    set_color(MYLER_DEFAULT_COLOR);
+    printf("\n");
     system("clear");
 }
 
@@ -79,7 +81,7 @@ void set_color(color_t color)
         color = MYLER_DEFAULT_COLOR;
 
     static const int color_tab[8] = {0, 4, 2, 6, 1, 5, 3, 7};
-    const char *bold_str = (color < 8 || color == 16 ? "" : "2;");
+    const char *bold_str = (color < 8 ? "" : "");
     int color_cole = (color == 16 ? 0 : 30 + color_tab[color % 8]);
 
     printf("\033[%s%dm", bold_str, color_cole);
@@ -163,5 +165,5 @@ int myler_putchar(int ch)
 
 void myler_delay_ms(int ms)
 {
-    
+    sleep(ms / 1000.);
 }
