@@ -140,7 +140,7 @@ static void create_ui_window(void)
     set_time_win_time(0, 0);
     set_ui_status_and_music_name(UI_NOT_USE, NULL);
 
-    list_t *list = create_list_from_path("MUSIC", "/home/mxb/Music");
+    list_t *list = create_list_from_path("MUSIC", "/home/mxb360/Music");
     set_listwin_list(ui.list_win, list);
     load_list_to_listwin(ui.list_win);
     free_list(list);

@@ -12,7 +12,7 @@
 #endif
 
 /* 引发一个运行时错误，使程序崩溃 */
-#define myler_crash()      do {(*(int *)0 = 0); exit(1); } while (0)
+#define myler_crash()      do {(*(volatile int *)0 = 0); exit(1); } while (0)
 
 /* 发生了不可挽回的错误，终止程序运行 */
 #define myler_panic(s)           _myler_panic(__FILE__, __func__, __LINE__, s)

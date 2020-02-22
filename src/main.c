@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
     myler_printf("Myler 命令行音乐播放器 V3.0\n");
 
     int n = 1;
-    list_t *list = create_list_from_path("MUSIC", "/home/mxb/Music");
+    list_t *list = create_list_from_path("MUSIC", "/home/mxb360/Music");
     if (list) {
         list_node_t *node = list->head.next;
         while (node) {

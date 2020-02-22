@@ -39,9 +39,9 @@ list_t *create_list_from_path(const char *list_name, const char *path)
             if (is_music_file(name))
                 insert_song_to_list(list, new_song(name), -1);
     } else {
-        free_list(list);
-        list = NULL;
-        myler_print_error("create_list_from_path(): get_all_file_abspath() return NULL");
+        //free_list(list);
+        //list = NULL;
+        myler_print_warning("create_list_from_path(): get_all_file_abspath() return NULL");
     }
     return list;
 }
